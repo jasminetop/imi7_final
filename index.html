@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet"  href="style.css">
+    </head>
+    <body>
+
+        <div class="world" id="world"><canvas id="sky"></canvas>
+          <div class="stage">
+          <div id="timer" class="font" style="color: rgba(240, 248, 255, 0.555);">60</div>
+          <div id="distance" class="font" style="position: absolute; top: 0%; right: 3%;color: rgba(240, 248, 255, 0.582);width:50%;float:right;text-align:right">0</div> 
+          <div class="house">
+                <div class="house__wall house__wall--left"></div>
+                <div class="house__wall house__wall--right"></div>
+                <div class="house__wall house__wall--bottom"></div>
+                <div class="house__wall house__wall--front house__wall--front-d"></div>
+                <div class="house__wall title">
+                  <img src="img/ending.png" id="ending"class="house__wall ending fade-in-box" style="display: none;">
+                  <img src="img/game_over.png" id="game_over"class="house__wall game_re fade-in-box2" style="display: none;">
+                  <img src="img/game_success.png" id="game_success"class="house__wall game_re fade-in-box2" style="display: none;">
+                  <input type="image" name="button" src="img/replay_button.png" id="replay_button"class="house__wall play_button fade-in-box2" style="display: none;" onclick="replay()">
+                  
+                  <img src="img/title_gotohell.png" id="title_gotohell"class="house__wall title">
+                  <input type="image" name="button" src="img/play_button.png" id="play_button" onclick="play()"class="house__wall play_button">
+                  <input type="image" name="button" src="img/help_button.png" id="help_button" onclick="help()"class="house__wall help_button">
+                  <input type="image" name="button" src="img/help_img.png" id="help_img" onclick="help_2()" style="display: none;"class="house__wall help_img">
+
+                  <div class="font walk" id="walk" style="font-size: 35pt;  color: rgba(255, 255, 255, 0.719); display: none;">앞으로 걸어보세요</div>
+                </div>
+                <img class="house__wall len1" src="img/등.png">
+                <img class="house__wall len2" src="img/등.png">
+                <img class="house__wall len3" src="img/등.png">
+                <img class="house__wall len4" src="img/등.png">
+                <img class="house__wall len5" src="img/등2.png">
+                <img class="house__wall len6" src="img/등2.png">
+                <img class="house__wall len7" src="img/등2.png">
+                <img class="house__wall len8" src="img/등2.png">
+                <audio id="rain" src="audio/rain.MP3"></audio>
+                <audio id="foot" src="audio/foot.MP3"></audio>
+
+                <audio id="g1" src="audio/audio_ghost.mp3"></audio>
+                <audio id="g2" src="audio/audio_ghost2.MP3"></audio>
+                <audio id="gl" src="audio/gl.mp3"></audio>
+                
+              <img id ="ghost" src="img/ghost2.png" onclick="disapperImg()" style="display: none;"/>
+                <img src="img/rope.png"class="rope" id="rope" style="display: none;">
+                
+                <figure>            
+                  <input type="image" name="button" src="img/대롱 괴물.png" class="ghost2" id="ghost1" style="display: none;" onclick="ghost2()">
+                </figure>  
+
+                <div class="house__wall house__wall--front house__wall--front-d"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <script>
+
+          if(location.protocol != 'https:'){
+            window.location = 'https://' +location.host + location.pathname;
+          }
+
+          var isStop = false;
+          
+          var title_gotohell = document.getElementById("title_gotohell");
+          var play_button = document.getElementById("play_button");
+          var help_button = document.getElementById("help_button");
+          var help_img = document.getElementById("help_img");
+          var ending = document.getElementById("ending");
+          var game_over = document.getElementById("game_over");
+          var game_success = document.getElementById("game_success");
+          var replay_button = document.getElementById("replay_button");
+            
+          var world = document.getElementById("world");
+
+          document.getElementById("foot").load();
+          document.getElementById("rain").load();
+
+          document.getElementById('rain').volume=0.05;
+          document.getElementById('foot').volume=0.9;
+          document.getElementById('foot').loop=true;
+
+
+
+          function end(){
+            console.log('엔딩버튼');
+
+            title_gotohell.style.display = 'none';
+            play_button.style.display = 'none';
+            help_button.style.display = 'none';
+            document.getElementById("ghost").style.display = 'none';
+            document.getElementById("ghost1").style.display = 'none';
+            document.getElementById("rope").style.display = 'none';
+
+            ending.style.display = 'block';
+
+            game_success.style.display = 'block';
+            replay_button.style.display = 'block';
+          }
+          function end2(){
+            console.log('엔딩2버튼');
+
+            title_gotohell.style.display = 'none';
+            play_button.style.display = 'none';
+            help_button.style.display = 'none';
+            document.getElementById("ghost").style.display = 'none';
+            document.getElementById("ghost1").style.display = 'none';
+            document.getElementById("rope").style.display = 'none';
+
+            ending.style.display = 'block';
+
+            game_over.style.display = 'block';
+            replay_button.style.display = 'block';
+          }
+            
+          function disapperImg(){
+            document.getElementById("ghost").style.display = 'none';
+            rain_color_re();
+          }
+
+
+          function help(){
+
+            title_gotohell.style.display = 'none';
+            play_button.style.display = 'none';
+            help_button.style.display = 'none';
+            help_img.style.display = 'block'; //도움말 보이기
+              
+          }
+          function help_2(){
+
+            help_img.style.display = 'none'; //도움말 감추기
+            title_gotohell.style.display = 'block';
+            play_button.style.display = 'block';
+            help_button.style.display = 'block';
+              
+          }
+          var time = 0;
+        
+          if (!Array.prototype.last) {
+            Array.prototype.last = function() {
+              return this[this.length - 1];
+            }
+            function play() {
+
+              time=60;
+              console.log("시작1");
+
+              document.getElementById('rain').play();
+
+              console.log("시작클릭");
+              isStop = false;
+              play_button.style.display = 'none';
+              help_button.style.display = 'none';
+
+              if (navigator.userAgent.match(/(Android)/) != null) {
+                window.addEventListener("devicemotion", motion, false); 
+                function motion(event) {    
+                  historicMotion["x"].push(event.acceleration.x)        
+                  historicMotion["y"].push(event.acceleration.y)        
+                  historicMotion["z"].push(event.acceleration.z)  
+                }  
+
+                var interval = setInterval(function() {
+                  if (!isStop) {
+                    updateStatus();
+                  } else {
+                    console.log("stopped");
+                    clearInterval(interval);
+                  }
+                }, 100)
+                function stop() {
+                  console.log("stop");
+                  isStop = true;
+                }
+
+                var x = setInterval(timer,1000);
+                function timer(){
+                  time--;
+
+                  if(time == 59){
+                    document.getElementById("walk").style.display = 'block'
+                  }
+                  if(time == 56){
+                    document.getElementById("walk").style.display = 'none'
+                  }
+                  if(time==5){
+                    document.getElementById("gl").play();
+                    world.classList.add('glitch');
+                  }
+                  if(time==0){
+                    document.getElementById("gl").pause();
+                    world.classList.remove('glitch');
+                    stop();
+                    houseElem.style.transform = 'translateZ(' + -500 + 'vw)';
+                    end2();
+                    document.getElementById('rain').pause();
+                    document.getElementById('foot').pause();
+                    document.getElementById('timer').innerHTML ='시간초과';
+                    clearInterval(x);
+                  }
+                  document.getElementById('timer').innerHTML = time;
+                } 
+                  
+                var historicMotion = {
+                  "x": [],
+                  "y": [],
+                  "z": []
+                }
+    
+                const houseElem = document.querySelector('.house');
+                var zMove = -500;
+                function updateStatus() {
+                  document.getElementById('foot').play();
+                  let movement = mostRecentMovementOverall(75)
+                  houseElem.style.transform = 'translateZ(' + zMove + 'vw)';
+                  if(movement > 18){
+                    zMove += 2;
+                  }else{
+                    document.getElementById('foot').pause();
+                  }
+                  if(zMove == -300){
+                    console.log("빼꼼");
+                    rain_color_ch();
+                    document.getElementById("g1").play();
+                    document.getElementById("ghost").style.display = 'block';
+                  }
+                  if(zMove == 0){
+                    ghost2();
+                    rain_color_ch();
+                    document.getElementById("g2").play();
+                    console.log("대롱");
+                  }
+                  if (zMove == 480){ //성공했을 때
+                    world.classList.remove('glitch');
+                    zMove = -500;
+                    houseElem.style.transform = 'translateZ(' + zMove + 'vw)';
+                    stop();
+                    clearInterval(x);
+                    end();
+                    document.getElementById('rain').pause();
+                    document.getElementById('foot').pause();
+                     
+                  }
+                      
+                }
+               
+                function mostRecentMovementOverall(numberOfHistoricPoints) {
+                  return (mostRecentMovement(historicMotion["x"], numberOfHistoricPoints, true) + 
+                          mostRecentMovement(historicMotion["y"], numberOfHistoricPoints, true) + 
+                          mostRecentMovement(historicMotion["z"], numberOfHistoricPoints, true)) / 3.0
+                }
+
+                function mostRecentMovement(array, numberOfHistoricPoints, removeNegatives) {
+                  if (array.length > numberOfHistoricPoints) {
+                    totalSum = 0
+                    for (var toCount = 0; toCount < numberOfHistoricPoints; toCount++) {
+                      currentElement = array[array.length - toCount - 1]
+                      currentElement *= (1 - toCount / numberOfHistoricPoints) // weight the most recent data more
+                      if (currentElement < 0 && removeNegatives) currentElement = currentElement * -1     
+                      if (currentElement > 0.1 || currentElement < -0.1) totalSum += currentElement
+                    }
+                    return totalSum * 100 / numberOfHistoricPoints
+                  }
+                  return 0 // not enough data yet
+                }  
+
+              }
+              else if(navigator.userAgent.match(/(iPhone|iPod|iPad)/)){
+                DeviceOrientationEvent.requestPermission().then(response => {
+                if (response == 'granted') {
+                  window.addEventListener("devicemotion", motion, false); 
+                  function motion(event) {  
+                    historicMotion["x"].push(event.acceleration.x)        
+                    historicMotion["y"].push(event.acceleration.y)        
+                    historicMotion["z"].push(event.acceleration.z)        
+                  }  
+                  
+                  
+                  var interval = setInterval(function() {
+                    if (!isStop) {
+                      updateStatus();
+                    } else {
+                      console.log("stopped");
+                      clearInterval(interval);
+                    }
+                  }, 100)
+                  function stop() {
+                    console.log("stop");
+                    isStop = true;
+                  }
+
+                  var x = setInterval(timer,1000);
+                  function timer(){
+                    time--;
+
+                    if(time == 59){
+                      document.getElementById("walk").style.display = 'block'
+                    }
+                    if(time == 56){
+                      document.getElementById("walk").style.display = 'none'
+                    }
+
+                    if(time==5){
+                      document.getElementById("gl").play();
+                      world.classList.add('glitch');
+                    }
+                    if(time==0){
+                      world.classList.remove('glitch');
+                      document.getElementById("gl").pause();
+                      stop();
+                      houseElem.style.transform = 'translateZ(' + -500 + 'vw)';
+                      end2();
+                      document.getElementById('rain').pause();
+                      document.getElementById('foot').pause();
+                      document.getElementById('timer').innerHTML ='시간초과';
+                      clearInterval(x);
+                    }
+                    document.getElementById('timer').innerHTML = time;
+                  }
+                  
+                  var historicMotion = {
+                    "x": [],
+                    "y": [],
+                    "z": []
+                  }
+    
+                  const houseElem = document.querySelector('.house');
+                  var zMove = -500;
+                  document.getElementById('foot').play();
+                  function updateStatus() {
+                    let movement = mostRecentMovementOverall(75)
+                    houseElem.style.transform = 'translateZ(' + zMove + 'vw)';
+                    if(movement > 18){
+                      zMove += 2;
+                    }else{
+                      document.getElementById('foot').pause();
+                    }
+
+                    let count = (zMove+500)*0.01;
+                    count=count.toFixed(2);
+                    document.getElementById('distance').innerHTML=
+                    '이동거리 :' + count +'m'+ '<br />';
+
+
+                    if(zMove == -300){
+                      console.log("빼꼼");
+                      rain_color_ch();
+                      document.getElementById("g1").play();
+                      document.getElementById("ghost").style.display = 'block';
+                    }
+                    if(zMove == 0){
+                      rain_color_ch();
+                      document.getElementById("g2").play();
+                      console.log("대롱");
+                      ghost2();
+
+                    }
+
+                    if (zMove == 480){ //성공했을 때
+                       world.classList.remove('glitch');
+                      zMove = -500;
+                      houseElem.style.transform = 'translateZ(' + zMove + 'vw)';
+                      stop();
+                      clearInterval(x);
+                      end();
+                      document.getElementById('rain').pause();
+                      document.getElementById('foot').pause();
+                    }
+                
+                  }
+
+
+                  function mostRecentMovementOverall(numberOfHistoricPoints) {
+                    return (mostRecentMovement(historicMotion["x"], numberOfHistoricPoints, true) + 
+                            mostRecentMovement(historicMotion["y"], numberOfHistoricPoints, true) + 
+                            mostRecentMovement(historicMotion["z"], numberOfHistoricPoints, true)) / 3.0
+                  }
+
+                  function mostRecentMovement(array, numberOfHistoricPoints, removeNegatives) {
+                    if (array.length > numberOfHistoricPoints) {
+                      totalSum = 0
+                      for (var toCount = 0; toCount < numberOfHistoricPoints; toCount++) {
+                        currentElement = array[array.length - toCount - 1]
+                        currentElement *= (1 - toCount / numberOfHistoricPoints) // weight the most recent data more
+                        if (currentElement < 0 && removeNegatives) currentElement = currentElement * -1     //음수를 양수로
+                        if (currentElement > 0.1 || currentElement < -0.1) totalSum += currentElement
+                      }
+                      return totalSum * 100 / numberOfHistoricPoints
+                    }
+                    return 0 // not enough data yet
+                  }  
+                }
+                });
+              }
+            }
+          };
+
+            function replay(){
+
+              console.log('리플레이 버튼');
+
+              document.getElementById('rain').pause();
+              document.getElementById('foot').pause();
+
+              title_gotohell.style.display = 'block';
+              play_button.style.display = 'block';
+              help_button.style.display = 'block';
+
+              ending.style.display = 'none';
+              game_over.style.display = 'none';
+              game_success.style.display = 'none';
+              replay_button.style.display = 'none';                
+            
+            }
+
+
+          
+          var count = 1;
+          function ghost2(){
+            
+            var ghost = document.getElementById('ghost1');
+            var rope = document.getElementById('rope');
+
+            console.log(count);
+
+            if (count %2 == 1){
+              ghost.style.display = 'block';
+              rope.style.display = 'block';
+              rope.classList.add('drop');
+              ghost.classList.add('swing');
+              ghost.classList.remove('drop_2');
+              
+            }
+
+            if (count %2 == 0){
+              rope.classList.remove('drop');
+              ghost.classList.remove('swing');
+              ghost.classList.add('drop_2');
+              rain_color_re();
+            }
+
+            count++;
+          }
+        
+          
+
+          //피 비 내리기
+          // Setup ///////////////////////////////////////////////////////////
+          var canvas = document.getElementById('sky');
+          var sky = canvas.getContext('2d');
+
+          var window_width = window.innerWidth * 1.5;
+          var window_height = window.innerHeight * 1.5;
+
+          var fall_speed = 0.5;
+          var wind_speed = 7;
+
+          var rain_weight = 0.1;
+          var rain_color = '100,100,100';
+
+          var drop_count;
+          var drops = [];
+
+          function rain_color_ch(){
+            rain_color = '100,0,0';
+          }
+          function rain_color_re(){
+            rain_color = '100,100,100';
+          }
+
+          // Helpers /////////////////////////////////////////////////////////
+          window.requestAnimFrame = (function(){
+            return  window.requestAnimationFrame       ||
+                    window.webkitRequestAnimationFrame ||
+                    window.mozRequestAnimationFrame    ||
+                    window.msRequestAnimationFrame     ||
+                    window.oRequestAnimationFrame      ||
+                    function( callback ){
+                      window.setTimeout(callback, 1000 / 60);
+                    };
+          })();
+
+          function randomFrom(min, max) {
+            return (Math.random() * (max - min) + min);
+          }
+
+          function resizer() {
+            window_width = window.innerWidth * 1.5;
+            window_height = window.innerHeight * 1.5;
+            drop_count = window_width * rain_weight;
+                  
+            canvas.setAttribute('width', window_width);
+            canvas.setAttribute('height', window_height);
+          }
+
+          window.addEventListener('resize', resizer, false);
+
+          // Drawing /////////////////////////////////////////////////////////
+          function paintSky() {
+            for (var i = 0; i < drop_count; i++) {
+              drops[i] = new drop();
+              drops[i].reset();
+            }
+                  
+            rain();
+          }
+
+          function rain() {
+            sky.clearRect(0, 0, window_width, window_height);
+
+            var drops_length = drops.length;
+
+            for (var i = 0; i < drops_length; i++) {
+              var drop = drops[i];
+              drop.fall();
+              drop.draw();
+            }
+
+            window.requestAnimFrame(rain);
+          }
+
+          function drop() {
+            this.reset = function() {
+              this.r = randomFrom(0.8, 1.6);
+              this.l = (this.r * 250);
+              this.x = randomFrom((window_width * -0.25), (window_width * 1.125));
+              this.y = randomFrom((window_height * -0.25), (window_height * -1));
+              this.dx = randomFrom((wind_speed - 3), (wind_speed + 3));
+              this.dy = (this.r * (100 * fall_speed));
+              this.offset = (this.l * (this.dx / this.dy));
+              this.opacity = (this.r * randomFrom(0.2, 0.6));
+              this.drip = this.render();
+            };
+                  
+            this.render = function() {
+              var canv = document.createElement('canvas');
+              var ctx = canv.getContext('2d');
+              canv.setAttribute('width', Math.abs(this.offset) + this.r);
+              canv.setAttribute('height', this.l);
+              ctx.beginPath();
+                  
+              var drip = ctx.createLinearGradient(0, 0, 0, this.l);
+              drip.addColorStop(0, 'rgba(' + rain_color + ', 0)');
+              drip.addColorStop(1, 'rgba(' + rain_color + ', ' + this.opacity + ')');
+              ctx.fillStyle = drip;
+                        
+              //sky.rect(this.x, this.y, this.r, this.l);
+              var startX = (this.offset >= 0) ? 0 : Math.abs(this.offset);
+              ctx.moveTo(startX, 0);
+              ctx.lineTo(startX + this.r, 0);
+              ctx.lineTo(startX + this.r + this.offset, this.l);
+              ctx.lineTo(startX + this.offset, this.l);
+
+              ctx.closePath();
+              ctx.fill();
+                    
+              return canv;
+            };
+                  
+            this.draw = function() {
+              sky.drawImage(this.drip, this.x, this.y);
+            };
+                  
+            this.fall = function() {
+              this.x += this.dx;
+              this.y += this.dy;
+                    
+              if (this.y > (window_height * 1.25)) {
+                this.reset();
+              }
+            };
+          }
+
+          resizer();
+          paintSky();
+          
+        </script>
+    </body>
+</html>
